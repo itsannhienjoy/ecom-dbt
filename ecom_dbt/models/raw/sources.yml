@@ -1,0 +1,38 @@
+sources:
+  - name: lnd
+    database: ECOM
+    schema: LND
+    tables:
+      - name: customers
+        identifier: lnd_customers
+      - name: orders
+        identifier: lnd_orders
+      - name: order_items
+        identifier: lnd_order_items
+      - name: order_payments
+        identifier: lnd_order_payments
+        config:
+          freshness:
+            warn_after:
+              count: 1
+              period: hour
+            error_after:
+              count: 1
+              period: hour
+      - name: order_reviews
+        identifier: lnd_order_reviews
+        config:
+          freshness:
+            warn_after:
+              count: 1
+              period: hour
+            error_after:
+              count: 1
+              period: hour
+      - name: products
+        identifier: lnd_products
+      - name: sellers
+        identifier: lnd_sellers
+      - name: product_category_name_translation
+        identifier: lnd_product_category_name_translation
+

@@ -1,0 +1,310 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: "Customer dimension table with SCD2 history. Contains one record per customer per version."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: source('lnd', 'customers')
+    columns:
+      - name: customer_pk
+        description: "Surrogate primary key for the customer dimension."
+        tests: [unique, not_null]
+      - name: customer_id
+        description: "Business key for the customer from the source system."
+        tests: [not_null]
+      - name: customer_unique_id
+        description: "Alternate unique identifier for the customer."
+      - name: customer_city
+        description: "City of the customer."
+      - name: customer_state
+        description: "State of the customer."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"]
+      - name: valid_from
+        description: "Timestamp when this version of the customer record became valid."
+      - name: valid_to
+        description: "Timestamp when this version of the customer record was superseded."
+      - name: is_current
+        description: "Boolean flag indicating if this is the current version of the customer record."
+
+  - name: dim_product
+    description: "Product dimension table with SCD2 history."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: source('lnd', 'products')
+    columns:
+      - name: product_pk
+        description: "Surrogate primary key for the product dimension."
+        tests: [unique, not_null]
+      - name: product_id
+        description: "Business key for the product."
+        tests: [not_null]
+      - name: product_category_name
+        description: "Product category name."
+      - name: product_name_length
+        description: "Length of the product name."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 100
+      - name: product_description_length
+        description: "Length of the product description."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 5000
+      - name: product_photos_qty
+        description: "Number of product photos."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 50
+      - name: product_weight_g
+        description: "Product weight in grams."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 50000
+      - name: product_length_cm
+        description: "Product length in centimeters."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: product_height_cm
+        description: "Product height in centimeters."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: product_width_cm
+        description: "Product width in centimeters."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: valid_from
+        description: "Timestamp when this version of the product record became valid."
+      - name: valid_to
+        description: "Timestamp when this version of the product record was superseded."
+      - name: is_current
+        description: "Boolean flag indicating if this is the current version of the product record."
+
+  - name: dim_seller
+    description: "Seller dimension table with SCD2 history."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: source('lnd', 'sellers')
+    columns:
+      - name: seller_pk
+        description: "Surrogate primary key for the seller dimension."
+        tests: [unique, not_null]
+      - name: seller_id
+        description: "Business key for the seller."
+        tests: [not_null]
+      - name: seller_zip_code_prefix
+        description: "Zip code prefix of the seller."
+      - name: seller_city
+        description: "City of the seller."
+      - name: seller_state
+        description: "State of the seller."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"]
+      - name: valid_from
+        description: "Timestamp when this version of the seller record became valid."
+      - name: valid_to
+        description: "Timestamp when this version of the seller record was superseded."
+      - name: is_current
+        description: "Boolean flag indicating if this is the current version of the seller record."
+
+  - name: fct_order_items
+    description: "Fact table for order items, with references to customer, product, and seller dimensions."
+    columns:
+      - name: order_id
+        description: "Order identifier."
+        tests: [not_null]
+      - name: order_item_id
+        description: "Line item identifier within the order."
+        tests: [not_null]
+      - name: customer_pk
+        description: "Foreign key to the customer dimension."
+      - name: product_pk
+        description: "Foreign key to the product dimension."
+      - name: seller_pk
+        description: "Foreign key to the seller dimension."
+      - name: order_date_pk
+        description: "Foreign key to the date dimension."
+        tests: [not_null]
+      - name: line_price
+        description: "Price of the item."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000
+      - name: line_freight
+        description: "Freight value for the item."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: order_item_unique_key
+        description: "Unique key for the order item (e.g., generated from order_id and order_item_id)."
+        tests: [not_null]
+
+  - name: fct_orders
+    description: "Fact table for orders, with references to customer, date, and order status dimensions."
+    columns:
+      - name: order_id
+        description: "Order identifier."
+        tests: [not_null]
+      - name: customer_pk
+        description: "Foreign key to the customer dimension."
+      - name: order_date_pk
+        description: "Foreign key to the date dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_pk
+      - name: order_status_pk
+        description: "Foreign key to the order status dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_order_status')
+              field: order_status_pk
+      - name: total_revenue
+        description: "Total revenue for the order."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100000
+      - name: total_paid
+        description: "Total amount paid for the order."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100000
+      - name: payment_count
+        description: "Number of payments for the order."
+      - name: review_time_pk
+        description: "Foreign key to the time dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_time')
+              field: time_pk
+
+  - name: fct_order_reviews
+    description: "Fact table for order reviews, including time and date foreign keys."
+    columns:
+      - name: review_id
+        description: "Primary key for the review."
+        tests: [unique, not_null]
+      - name: order_id
+        description: "Foreign key to the order."
+        tests: [not_null]
+      - name: customer_pk
+        description: "Foreign key to the customer dimension."
+        tests: [not_null]
+      - name: creation_date_pk
+        description: "Foreign key to the date dimension for review creation date."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_pk
+      - name: answer_date_pk
+        description: "Foreign key to the date dimension for review answer date."
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_pk
+      - name: review_time_pk
+        description: "Foreign key to the time dimension for review creation time."
+        tests:
+          - relationships:
+              to: ref('dim_time')
+              field: time_pk
+      - name: answer_time_pk
+        description: "Foreign key to the time dimension for review answer time."
+        tests:
+          - relationships:
+              to: ref('dim_time')
+              field: time_pk
+      - name: review_score
+        description: "Score given in the review."
+        tests: [not_null]
+      - name: review_comment_title
+        description: "Title of the review comment."
+      - name: review_comment_message
+        description: "Message of the review comment."
+      - name: review_month
+        description: "Year and month of the review creation date (YYYY-MM)."
+
+  - name: dim_date
+    description: "Date dimension table for all event dates in the data warehouse."
+    columns:
+      - name: date_pk
+        description: "Surrogate primary key for the date dimension."
+        tests: [unique, not_null]
+      - name: date_key
+        description: "Date value (YYYY-MM-DD)."
+        tests: [unique, not_null]
+      - name: year
+        description: "Year component of the date."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2016
+              max_value: 2030
+      - name: month
+        description: "Month component of the date."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 12
+      - name: day
+        description: "Day component of the date."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 31
+      - name: week
+        description: "Week number of the year."
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 53
+      - name: day_name
+        description: "Name of the day (e.g., Monday)."
+      - name: month_name
+        description: "Name of the month (e.g., January)."
+      - name: is_weekend
+        description: "Boolean flag for weekend days."
+
+  - name: dim_payment_type
+    description: "Payment type dimension table."
+    columns:
+      - name: payment_type_pk
+        description: "Surrogate primary key for the payment type dimension."
+        tests: [unique, not_null]
+      - name: payment_type
+        description: "Type of payment (numeric code)."
+        tests: 
+          - unique
+          - not_null
+
+  - name: dim_order_status
+    description: "Order status dimension table."
+    columns:
+      - name: order_status_pk
+        description: "Surrogate primary key for the order status dimension."
+        tests: [unique, not_null]
+      - name: order_status
+        description: "Order status value."
+        tests: 
+          - unique
+          - not_null

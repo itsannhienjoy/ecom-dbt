@@ -1,0 +1,14 @@
+ecom_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: qknzlvx-gr38570
+      user: dbt
+      role: transform
+      database: ECOM
+      warehouse: COMPUTE_WH
+      schema: DEV
+      authenticator: snowflake_jwt
+      private_key_path: /Users/jennydo/.ssh/snowflake/rsa_key.p8
+      threads: 10
