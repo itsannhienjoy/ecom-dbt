@@ -9,10 +9,15 @@ RUN pip install -r requirements.txt
 
 # Add repository code
 WORKDIR /opt/dagster/app
-COPY ./ecom_dagster/ecom_dagster /opt/dagster/app/ecom_dagster
+COPY ./ecom_dagster /opt/dagster/app/ecom_dagster
 COPY ./ecom_dbt /opt/dagster/app/ecom_dbt
+
+# Install the ecom_dagster package in development mode
+WORKDIR /opt/dagster/app/ecom_dagster
+RUN pip install -e .
+WORKDIR /opt/dagster/app
 
 # 
 EXPOSE 4000
 
-CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-m", "airbnb_dagster.definitions"]
+CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-m", "ecom_dagster.definitions"]

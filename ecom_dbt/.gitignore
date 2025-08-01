@@ -2,3 +2,4 @@
 target/
 dbt_packages/
 logs/
+ecom_dbt/keys/rsa_key.p8

@@ -1,14 +1,16 @@
 ecom_dbt:
-  target: dev
+  target: "{{ env_var('DBT_TARGET', default='dev') }}"
   outputs:
     dev:
       type: snowflake
-      account: qknzlvx-gr38570
-      user: dbt
-      role: transform
-      database: ECOM
-      warehouse: COMPUTE_WH
-      schema: DEV
-      authenticator: snowflake_jwt
-      private_key_path: /Users/jennydo/.ssh/snowflake/rsa_key.p8
-      threads: 10
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', default='ECOM') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', default='COMPUTE_WH') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', default='DEV') }}"
+      threads: "{{ env_var('SNOWFLAKE_THREADS', default=10) }}"
+      authenticator: "{{ env_var('SNOWFLAKE_AUTHENTICATOR', default='snowflake_jwt') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', default='/Users/jennydo/.ssh/snowflake/rsa_key.p8') }}"
+  
