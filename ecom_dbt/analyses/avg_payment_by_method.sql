@@ -1,7 +1,7 @@
 select
-    pt.payment_type,
-    avg(f.total_paid) as avg_payment
+    p.payment_type,
+    avg(p.payment_value) as avg_payment
 from {{ ref('fct_orders') }} f
-join {{ ref('dim_payment_type') }} pt on f.payment_type_pk = pt.payment_type_pk
-group by pt.payment_type
+join {{ ref('dim_payment') }} p on f.order_id = p.order_id
+group by p.payment_type
 order by avg_payment desc

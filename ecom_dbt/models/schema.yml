@@ -92,6 +92,32 @@ models:
       - name: is_current
         description: "Boolean flag indicating if this is the current version of the product record."
 
+  - name: dim_payment
+    description: "Payment transaction dimension table. One row per payment event."
+    columns:
+      - name: payment_sequential
+        description: "Sequential number of the payment for the order. (PK)"
+        tests: [not_null]
+      - name: order_id
+        description: "Order ID (PK, FK to fct_orders)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('fct_orders')
+              field: order_id
+      - name: payment_type
+        description: "Type of payment method."
+        tests: [not_null]
+      - name: payment_installments
+        description: "Number of installments for the payment."
+      - name: payment_value
+        description: "Value of the payment."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - order_id
+            - payment_sequential
+
   - name: dim_seller
     description: "Seller dimension table with SCD2 history."
     tests:
