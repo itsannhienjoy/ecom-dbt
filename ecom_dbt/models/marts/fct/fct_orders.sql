@@ -27,8 +27,6 @@ src as (
     o.order_status,
     to_timestamp(o.order_purchase_timestamp) as purchase_ts
   from {{ ref('stg_orders') }} o
-
-
 ),
 
 final as (
@@ -40,7 +38,7 @@ final as (
     coalesce(rev.total_revenue, 0) as total_revenue,
     coalesce(pay.total_paid, 0) as total_paid,
     coalesce(pay.payment_count, 0) as payment_count,
-    t.time_pk as review_time_pk
+    t.time_pk as order_time_pk
   from src s
   left join payments_rollup pay on s.order_id = pay.order_id
   left join revenue_rollup rev on s.order_id = rev.order_id
