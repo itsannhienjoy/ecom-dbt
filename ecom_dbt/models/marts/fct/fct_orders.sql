@@ -27,7 +27,7 @@ src as (
     o.order_status,
     to_timestamp(o.order_purchase_timestamp) as purchase_ts
   from {{ ref('stg_orders') }} o
-),
+)
 
 select
   s.order_id as order_pk,
@@ -46,5 +46,4 @@ left join {{ ref('dim_customer') }} c on s.customer_id = c.customer_id
   and s.purchase_ts between c.valid_from and coalesce(c.valid_to, '2999-12-31')
 left join {{ ref('dim_date') }} d on cast(s.purchase_ts as date) = d.date_key
 left join {{ ref('dim_order_status') }} os on s.order_status = os.order_status
-left join {{ ref('dim_time') }} t
-  on to_time(s.purchase_ts) = t.time_key
+left join {{ ref('dim_time') }} t  on to_time(s.purchase_ts) = t.time_key

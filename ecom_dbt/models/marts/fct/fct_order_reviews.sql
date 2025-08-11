@@ -19,7 +19,6 @@ with src as (
     row_number() over (partition by r.review_id order by r.review_creation_date desc) as rn
   from {{ ref('stg_order_reviews') }} r
   left join {{ ref('stg_orders') }} o on r.order_id = o.order_id
-  where r.review_comment_message is not null
 ),
 
 deduplicated_src as (
