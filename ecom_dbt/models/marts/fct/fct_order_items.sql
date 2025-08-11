@@ -47,5 +47,5 @@ select
   order_date_pk,
   price as line_price,
   freight_value as line_freight,
-  order_item_unique_key
+  md5(concat(order_id, '|', order_item_id)) as order_item_pk
 from enriched

@@ -216,8 +216,8 @@ models:
               max_value: 100000
       - name: payment_count
         description: "Number of payments for the order."
-      - name: review_time_pk
-        description: "Foreign key to the time dimension."
+      - name: order_time_pk
+        description: "Foreign key to the time dimension for order purchase time."
         tests:
           - not_null
           - relationships:
