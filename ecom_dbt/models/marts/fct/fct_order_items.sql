@@ -25,14 +25,14 @@ with base as (
     d.date_pk as order_date_pk
   from base b
   left join {{ ref('dim_customer') }} c
-    on b.customer_id_norm = c.customer_id_norm
-   and b.purchase_ts between c.valid_from and coalesce(c.valid_to, to_timestamp('2999-12-31'))
+    on upper(trim(b.customer_id)) = c.customer_id_norm
+
   left join {{ ref('dim_product') }} p
-    on b.product_id_norm = p.product_id_norm
-   and b.purchase_ts between p.valid_from and coalesce(p.valid_to, to_timestamp('2999-12-31'))
+    on upper(trim(src.product_id)) = p.product_id_norm
+
   left join {{ ref('dim_seller') }} s
-    on b.seller_id_norm = s.seller_id_norm
-   and b.purchase_ts between s.valid_from and coalesce(s.valid_to, to_timestamp('2999-12-31'))
+    on upper(trim(src.seller_id)) = s.seller_id_norm
+  
   left join {{ ref('dim_date') }} d
     on cast(b.purchase_ts as date) = d.date_key
 )

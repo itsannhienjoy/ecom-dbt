@@ -37,11 +37,10 @@ from src s
 left join payments_rollup pay on s.order_id = pay.order_id
 left join revenue_rollup  rev on s.order_id = rev.order_id
 left join {{ ref('dim_customer') }} c
-  on s.customer_id_norm = c.customer_id_norm
- and s.purchase_ts between c.valid_from and coalesce(c.valid_to, to_timestamp('2999-12-31'))
+  on upper(trim(s.customer_id)) = c.customer_id_norm
 left join {{ ref('dim_date') }} d
   on cast(s.purchase_ts as date) = d.date_key
 left join {{ ref('dim_order_status') }} os
-  on s.order_status_norm = os.order_status
+  on upper(trim(s.order_status)) = os.order_status 
 left join {{ ref('dim_time') }} t
   on to_time(to_char(s.purchase_ts,'HH24:MI:SS')) = t.time_key
