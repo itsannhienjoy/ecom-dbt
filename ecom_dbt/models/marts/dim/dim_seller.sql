@@ -1,14 +1,15 @@
-{{ config(materialized='table')}}
+{{ config(materialized='table') }}
 
 with src as (
-    select
-        seller_id,
-        seller_zip_code_prefix,
-        seller_city,
-        seller_state,
-        dbt_valid_from as valid_from,
-        coalesce(dbt_valid_to, '9999-12-31') as valid_to
-    from {{ ref('sellers_snapshot') }}
+  select
+    upper(trim(seller_id)) as seller_id_norm,
+    seller_id,
+    seller_zip_code_prefix,
+    seller_city,
+    seller_state,
+    cast(dbt_valid_from as timestamp) as valid_from,
+    cast(coalesce(dbt_valid_to,'2999-12-31') as timestamp) as valid_to
+  from {{ ref('sellers_snapshot') }}
 )
 
 select
@@ -18,5 +19,6 @@ select
   seller_city,
   seller_state,
   valid_from,
-  valid_to
+  valid_to,
+  seller_id_norm
 from src
