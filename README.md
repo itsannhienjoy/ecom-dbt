@@ -18,11 +18,11 @@ Our data pipeline is designed following the Lakehouse architecture paradigm, com
 
 Azure Data Factory (ADF) orchestrates the ingestion process by connecting to Google Drive and retrieving the latest raw Excel files. The pipeline is configured to run on a scheduled basis, automatically copying new or updated files from Google Cloud storage into the raw zone of Azure Data Lake Storage Gen2 (ADLS Gen2). This ensures that the data lake is consistently populated with up-to-date source data.
 
-![Pipeline Debug](./pl_debug.png)
+![Pipeline Debug](./screenshots/pl_debug.png)
 
-![Pipeline Run](./pipeline_runs.png)
+![Pipeline Run](./screenshots/pipeline_runs.png)
 
-![Trigger Run](./trigger_runs.png)
+![Trigger Run](./screenshots/trigger_runs.png)
 
 ### Data Lake Storage (Raw and Processed Zones)
 
