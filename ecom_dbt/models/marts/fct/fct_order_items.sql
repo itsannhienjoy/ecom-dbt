@@ -28,10 +28,10 @@ with base as (
     on upper(trim(b.customer_id)) = c.customer_id_norm
 
   left join {{ ref('dim_product') }} p
-    on upper(trim(src.product_id)) = p.product_id_norm
+    on b.product_id_norm = p.product_id_norm
 
   left join {{ ref('dim_seller') }} s
-    on upper(trim(src.seller_id)) = s.seller_id_norm
+    on b.seller_id_norm = s.seller_id_norm
   
   left join {{ ref('dim_date') }} d
     on cast(b.purchase_ts as date) = d.date_key

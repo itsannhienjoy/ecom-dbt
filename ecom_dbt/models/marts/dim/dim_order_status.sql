@@ -5,6 +5,6 @@ with src as (
 )
 
 select
-  {{ dbt_utils.generate_surrogate_key(['order_status']) }}  as order_status_pk,
-  order_status
+  {{ dbt_utils.generate_surrogate_key(['upper(trim(order_status))']) }} as order_status_pk,
+  upper(trim(order_status)) as order_status
 from src

@@ -157,13 +157,32 @@ models:
         tests: [not_null]
       - name: customer_pk
         description: "Foreign key to the customer dimension."
+        tests:
+        - not_null
+        - relationships:
+            to: ref('dim_customer')
+            field: customer_pk
       - name: product_pk
         description: "Foreign key to the product dimension."
+        tests:
+        - not_null
+        - relationships:
+            to: ref('dim_product')
+            field: product_pk
       - name: seller_pk
         description: "Foreign key to the seller dimension."
+        tests:
+        - not_null
+        - relationships:
+            to: ref('dim_seller')
+            field: seller_pk
       - name: order_date_pk
         description: "Foreign key to the date dimension."
-        tests: [not_null]
+        tests:
+        - not_null
+        - relationships:
+            to: ref('dim_date')
+            field: date_pk
       - name: line_price
         description: "Price of the item."
         tests:
@@ -176,9 +195,8 @@ models:
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
               max_value: 1000
-      - name: order_item_unique_key
-        description: "Unique key for the order item (e.g., generated from order_id and order_item_id)."
-        tests: [not_null]
+      - name: order_item_pk
+        tests: [unique, not_null]
 
   - name: fct_orders
     description: "Fact table for orders, with references to customer, date, and order status dimensions."
@@ -186,8 +204,16 @@ models:
       - name: order_id
         description: "Order identifier."
         tests: [not_null]
+      - name: order_pk
+        description: "Surrogate primary key for the order dimension."
+        tests: [unique, not_null]
       - name: customer_pk
         description: "Foreign key to the customer dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_pk
       - name: order_date_pk
         description: "Foreign key to the date dimension."
         tests:

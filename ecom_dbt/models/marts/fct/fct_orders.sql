@@ -28,7 +28,7 @@ select
   s.order_id,
   c.customer_pk,
   d.date_pk       as order_date_pk,
-  os.order_status_pk,
+  {{ dbt_utils.generate_surrogate_key(['order_status_norm']) }} as order_status_pk,
   coalesce(rev.total_revenue, 0) as total_revenue,
   coalesce(pay.total_paid, 0)    as total_paid,
   coalesce(pay.payment_count, 0) as payment_count,
@@ -41,6 +41,6 @@ left join {{ ref('dim_customer') }} c
 left join {{ ref('dim_date') }} d
   on cast(s.purchase_ts as date) = d.date_key
 left join {{ ref('dim_order_status') }} os
-  on upper(trim(s.order_status)) = os.order_status 
+  on s.order_status_norm = os.order_status 
 left join {{ ref('dim_time') }} t
   on to_time(to_char(s.purchase_ts,'HH24:MI:SS')) = t.time_key
