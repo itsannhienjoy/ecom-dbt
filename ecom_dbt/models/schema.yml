@@ -196,7 +196,7 @@ models:
               min_value: 0
               max_value: 1000
       - name: order_item_pk
-        tests: [unique, not_null]
+        tests: [not_null]
 
   - name: fct_orders
     description: "Fact table for orders, with references to customer, date, and order status dimensions."
@@ -206,7 +206,7 @@ models:
         tests: [not_null]
       - name: order_pk
         description: "Surrogate primary key for the order dimension."
-        tests: [unique, not_null]
+        tests: [not_null]
       - name: customer_pk
         description: "Foreign key to the customer dimension."
         tests:

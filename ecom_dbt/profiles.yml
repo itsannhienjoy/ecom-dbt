@@ -10,7 +10,7 @@ ecom_dbt:
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', default='COMPUTE_WH') }}"
       schema: "{{ env_var('SNOWFLAKE_SCHEMA', default='DEV') }}"
-      threads: "{{ env_var('SNOWFLAKE_THREADS', default=10) }}"
+      threads: "{{ env_var('SNOWFLAKE_THREADS', default=10) | int }}"
       authenticator: "{{ env_var('SNOWFLAKE_AUTHENTICATOR', default='snowflake_jwt') }}"
       private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', default='/Users/jennydo/.ssh/snowflake/rsa_key.p8') }}"
   

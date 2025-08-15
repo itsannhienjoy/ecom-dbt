@@ -15,7 +15,7 @@ select
   extract(month from dt) as month,
   extract(day from dt) as day,
   extract(week from dt) as week,
-  to_char(dt,'Day') as day_name,
+  initcap(trim(to_char(dt, 'DAY'))) as day_name,
   to_char(dt,'Mon') as month_name,
   case when extract(dow from dt) in (0,6) then true else false end as is_weekend
 from dates
