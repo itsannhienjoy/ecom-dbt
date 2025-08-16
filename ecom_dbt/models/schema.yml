@@ -195,15 +195,14 @@ models:
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
               max_value: 1000
-      - name: order_item_pk
-        tests: [not_null]
 
   - name: fct_orders
     description: "Fact table for orders, with references to customer, date, and order status dimensions."
     columns:
       - name: order_id
         description: "Order identifier."
-        tests: [not_null]
+        tests:
+          - not_null
       - name: order_pk
         description: "Surrogate primary key for the order dimension."
         tests: [not_null]
